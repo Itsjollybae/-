@@ -1,0 +1,99 @@
+<?php
+
+class Person {
+    private $name;
+    private $age;
+    private $login;
+
+  public function __construct($name = '', $age = 0, $login = '') {
+        $this->name = $name;
+        $this->age = $age;
+        $this->login = $login;
+    }
+
+  public function __get($property) {
+      if (property_exists($this, $property)) {
+          return $this->$property;
+      }
+      throw new Exception("Свойство '$property' не существует.");
+  }
+
+  public function __set($property, $value) {
+        if (property_exists($this, $property)) {
+            $this->$property = $value;
+        } else {
+            throw new Exception("Свойство '$property' не существует.");
+        }
+    }
+
+   public function __sleep() {
+      return ['name', 'age', 'login'];
+    }
+
+  public function __wakeup() {
+      echo "Объект был десериализирован.\n";
+    }
+
+  public function __toString() {
+      return "Имя: {$this->name}, Возраст: {$this->age}, Логин: {$this->login}\n";
+    }
+}
+
+class PeopleList implements Iterator {
+    private $people = [];
+    private $position = 0;
+
+    public function add(Person $person) {
+        $this->people[] = $person;
+    }
+
+
+    public function rewind(): void {
+        $this->position = 0;
+    }
+
+    public function current(): mixed {
+        return $this->people[$this->position];
+    }
+
+    public function key(): mixed {
+        return $this->position;
+    }
+
+    public function next(): void {
+        ++$this->position;
+    }
+
+    public function valid(): bool {
+        return isset($this->people[$this->position]);
+    }
+}
+
+$person = new Person('Иван', 30, 'ivanov');
+echo "Создан объект:\n";
+echo $person . "\n\n"; 
+
+$serialized_person = serialize($person);
+echo "Сериализованный объект:\n";
+var_dump($serialized_person);
+echo "\n\n";
+
+$new_login = 'petrov';
+$modified_serialized_person = str_replace($person->login, $new_login, $serialized_person);
+echo "Измененный сериализованный объект:\n";
+var_dump($modified_serialized_person);
+echo "\n\n";
+
+$deserialized_person = unserialize($modified_serialized_person);
+echo "Десериализованный объект:\n";
+echo $deserialized_person . "\n\n";
+
+$people_list = new PeopleList();
+$people_list->add(new Person('Иван', 30, 'ivanov'));
+$people_list->add(new Person('Петр', 25, 'petrov'));
+$people_list->add(new Person('Анна', 28, 'annasidorova'));
+
+foreach ($people_list as $key => $person) {
+    echo "Человек №{$key}: \n";
+    echo $person . "\n";
+}
