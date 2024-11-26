@@ -1,0 +1,42 @@
+<?php
+
+trait AppUserAuthentication {
+    private $login = 'app_user_login';
+    private $password = 'app_user_password';
+
+    public function authenticate() {
+        echo 'Метод authenticate из AppUserAuthentication вызван.' . PHP_EOL;
+        return true;
+    }
+}
+
+trait MobileUserAuthentication {
+    private $mobileLogin = 'mobile_user_login';
+    private $mobilePassword = 'mobile_user_password';
+
+    public function authenticate() {
+        echo 'Метод authenticate из MobileUserAuthentication вызван.' . PHP_EOL;
+        return true;
+    }
+}
+
+class User {
+    use AppUserAuthentication, MobileUserAuthentication {
+        AppUserAuthentication::authenticate insteadof MobileUserAuthentication;
+        MobileUserAuthentication::authenticate as mobileAuthenticate;
+    }
+
+    public function checkAuth() {
+        if ($this->authenticate()) {
+            echo "Пользователь авторизован через AppUserAuthentication\n";
+            return true;
+        } elseif ($this->mobileAuthenticate()) {
+            echo "Пользователь авторизован через MobileUserAuthentication\n";
+            return true;
+        }
+        return false;
+    }
+}
+
+$user = new User;
+$user->checkAuth();
