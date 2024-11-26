@@ -1,0 +1,80 @@
+CREATE TABLE shop (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL
+);
+
+CREATE TABLE product (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    count INTEGER DEFAULT 0,
+    shop_id INTEGER,
+    FOREIGN KEY (shop_id) REFERENCES shop(id) ON DELETE CASCADE
+);
+
+CREATE TABLE client (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    phone TEXT,
+    name TEXT
+);
+
+CREATE TABLE "order" (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    client_id INTEGER,
+    shop_id INTEGER,
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE SET NULL,
+    FOREIGN KEY (shop_id) REFERENCES shop(id) ON DELETE SET NULL
+);
+
+CREATE TABLE order_product (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER,
+    product_id INTEGER,
+    quantity INTEGER DEFAULT 1,
+    price REAL NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES "order"(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
+);
+
+INSERT INTO shop (name, address) VALUES
+('Магазин 1', 'Адрес 1'),
+('Магазин 2', 'Адрес 2'),
+('Магазин 3', 'Адрес 3'),
+('Магазин 4', 'Адрес 4'),
+('Магазин 5', 'Адрес 5');
+
+INSERT INTO product (name, price, count, shop_id) VALUES
+('Продукт 1', 100.00, 10, 1),
+('Продукт 2', 200.00, 15, 1),
+('Продукт 3', 300.00, 20, 2),
+('Продукт 4', 400.00, 25, 2),
+('Продукт 5', 500.00, 30, 3);
+
+INSERT INTO client (phone, name) VALUES
+('+79991112233', 'Покупатель 1'),
+('+79992223344', 'Покупатель 2'),
+('+79993334455', 'Покупатель 3'),
+('+79994445566', 'Покупатель 4'),
+('+79995556677', 'Покупатель 5');
+
+INSERT INTO "order" (client_id, shop_id) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+INSERT INTO order_product (order_id, product_id, quantity, price) VALUES
+(1, 1, 2, 100.00),
+(2, 2, 3, 200.00),
+(3, 3, 4, 300.00),
+(4, 4, 5, 400.00),
+(5, 5, 6, 500.00);
+
+SELECT * FROM shop;
+SELECT * FROM product;
+SELECT * FROM client;
+SELECT * FROM "order";
+SELECT * FROM order_product;
